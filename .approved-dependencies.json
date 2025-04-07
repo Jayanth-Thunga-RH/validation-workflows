@@ -1,0 +1,13 @@
+{
+    "AdvanceMDAPILib": "[5.0.2]",
+    "RevivalHealthAPIs": "[5.0.1]",
+    "RH_Logging": "[5.0.1]",
+    "RH_Logins": "[5.0.10]",
+    "UiPath.Excel.Activities": "[2.20.1]",
+    "UiPath.System.Activities": "[23.4.2]",
+    "UiPath.Testing.Activities": "[24.10.3]",
+    "UiPath.UIAutomation.Activities": "[24.10.10]",
+    "VIGSuiteLib": "[5.0.13]",
+    "VitalInteraction._1Password.Activities": "[1.0.13]"
+  }
+  
