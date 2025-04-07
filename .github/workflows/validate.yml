@@ -1,0 +1,33 @@
+name: Validate UiPath Dependencies
+
+on:
+  workflow_call:
+    inputs:
+      branch:
+        required: false
+        type: string
+        default: main
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout target repo
+        uses: actions/checkout@v3
+        with:
+          repository: ${{ github.repository }}
+          ref: ${{ inputs.branch }}
+
+      - name: Checkout validator logic
+        uses: actions/checkout@v3
+        with:
+          repository: revivalhealthllc/validation-workflows
+          path: .infra
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Run validation
+        run: python .infra/scripts/validate_project.py
