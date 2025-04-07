@@ -2,8 +2,11 @@ import json
 import os
 import sys
 
-PROJECT_JSON = "project.json"
-APPROVED_DEPENDENCIES_JSON = ".infra/scripts/.approved-dependencies.json"
+# Use path relative to the script location
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+ROOT_DIR = os.path.abspath(os.path.join(SCRIPT_DIR, "../../"))
+PROJECT_JSON = os.path.join(ROOT_DIR, "project.json")
+APPROVED_DEPENDENCIES_JSON = os.path.join(SCRIPT_DIR, ".approved-dependencies.json")
 
 def load_json(path):
     with open(path, "r", encoding="utf-8") as f:
@@ -41,7 +44,7 @@ def main():
     if not has_warnings:
         print("✅ All dependencies match approved versions.")
     else:
-        print("\nDependency warnings found. Please review before merging.")
+        print("\n⚠️ Dependency warnings found. Please review before merging.")
 
 if __name__ == "__main__":
     main()
