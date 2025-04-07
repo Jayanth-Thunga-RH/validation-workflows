@@ -9,8 +9,13 @@ def load_json(path):
     with open(path, "r", encoding="utf-8") as f:
         return json.load(f)
 
+def normalize_version(value):
+    # If version is a list like ["2.20.11"], return first item
+    if isinstance(value, list):
+        return value[0] if value else None
+    return value
+
 def main():
-    # Load project.json
     if not os.path.exists(PROJECT_JSON):
         print(f"❌ ERROR: {PROJECT_JSON} not found.")
         sys.exit(1)
@@ -18,31 +23,31 @@ def main():
     project_data = load_json(PROJECT_JSON)
     project_deps = project_data.get("dependencies", {})
 
-    # Load approved dependencies
     if not os.path.exists(APPROVED_DEPENDENCIES_JSON):
         print(f"❌ ERROR: {APPROVED_DEPENDENCIES_JSON} not found.")
         sys.exit(1)
 
     approved_data = load_json(APPROVED_DEPENDENCIES_JSON)
 
-    # Validate
     print("🔍 Validating dependencies...\n")
-    has_warnings = False
+    has_issues = False
 
     for dep, version in project_deps.items():
-        approved_version = approved_data.get(dep)
+        project_version = normalize_version(version)
+        approved_version = normalize_version(approved_data.get(dep))
+
         if approved_version is None:
             print(f"⚠️  '{dep}' is not in the approved list.")
-            has_warnings = True
-        elif version != approved_version:
-            print(f"⚠️  '{dep}' version mismatch. Found [{version}], expected [{approved_version}].")
-            has_warnings = True
+            has_issues = True
+        elif project_version != approved_version:
+            print(f"⚠️  '{dep}' version mismatch. Found [{project_version}], expected [{approved_version}].")
+            has_issues = True
 
-    if not has_warnings:
-        print("✅ All dependencies match approved versions.")
-    else:
+    if has_issues:
         print("\n⚠️  Dependency issues found. Please review.")
-        sys.exit(2)  # <-- This is key: make the workflow fail
+        sys.exit(2)
+    else:
+        print("✅ All dependencies match approved versions.")
 
 if __name__ == "__main__":
     main()
