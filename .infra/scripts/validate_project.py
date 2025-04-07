@@ -2,13 +2,10 @@ import json
 import os
 import sys
 
-# Find root of the repo being validated (where project.json is)
-ROOT_DIR = os.getcwd()
+# Get absolute paths
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))  # .infra/scripts
+ROOT_DIR = os.path.abspath(os.path.join(SCRIPT_DIR, "../../"))  # Top level of the repo
 
-# Path to this script
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-
-# Paths
 PROJECT_JSON = os.path.join(ROOT_DIR, "project.json")
 APPROVED_DEPENDENCIES_JSON = os.path.join(SCRIPT_DIR, ".approved-dependencies.json")
 
@@ -17,22 +14,24 @@ def load_json(path):
         return json.load(f)
 
 def main():
+    print(f"🔍 Looking for project.json at: {PROJECT_JSON}")
+    print(f"🔍 Looking for approved dependencies at: {APPROVED_DEPENDENCIES_JSON}")
+
     if not os.path.exists(PROJECT_JSON):
-        print(f"ERROR: {PROJECT_JSON} not found.")
+        print(f"❌ ERROR: {PROJECT_JSON} not found.")
+        sys.exit(1)
+
+    if not os.path.exists(APPROVED_DEPENDENCIES_JSON):
+        print(f"❌ ERROR: {APPROVED_DEPENDENCIES_JSON} not found.")
         sys.exit(1)
 
     project_data = load_json(PROJECT_JSON)
-    project_deps = project_data.get("dependencies", {})
-
-    if not os.path.exists(APPROVED_DEPENDENCIES_JSON):
-        print(f"ERROR: {APPROVED_DEPENDENCIES_JSON} not found.")
-        sys.exit(1)
-
     approved_data = load_json(APPROVED_DEPENDENCIES_JSON)
 
-    print("🔍 Validating dependencies...\n")
+    project_deps = project_data.get("dependencies", {})
     has_warnings = False
 
+    print("\n🔎 Validating dependencies...\n")
     for dep, version in project_deps.items():
         approved_version = approved_data.get(dep)
         if approved_version is None:
@@ -43,9 +42,9 @@ def main():
             has_warnings = True
 
     if not has_warnings:
-        print(" All dependencies match approved versions.")
+        print("✅ All dependencies match approved versions.")
     else:
-        print("\n Dependency warnings found. Please review before merging.")
+        print("\n⚠️ Dependency warnings found. Please review before merging.")
 
 if __name__ == "__main__":
     main()
