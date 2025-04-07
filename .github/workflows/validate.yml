@@ -18,7 +18,7 @@ jobs:
           repository: ${{ github.repository }}
           ref: ${{ inputs.branch }}
 
-      - name: Checkout validator
+      - name: Checkout validator logic
         uses: actions/checkout@v3
         with:
           repository: Jayanth-Thunga-RH/validation-workflows
@@ -30,4 +30,5 @@ jobs:
           python-version: '3.10'
 
       - name: Run validation
-        run: python .infra/scripts/validate_project.py
+        working-directory: .infra/scripts
+        run: python validate_project.py
